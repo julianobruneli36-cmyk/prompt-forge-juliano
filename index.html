@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROMPT FORGE JULIANO - SISTEMA REAL V3</title>
+    <title>PROMPT FORGE JULIANO - AI REAL V4</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -165,7 +165,7 @@
 <div class="container">
     <header>
         <h1>Prompt Forge Juliano</h1>
-        <p style="color: #666; font-size: 0.8rem; letter-spacing: 2px;">O SEU ASSISTENTE REAL DE ROTEIROS VIRAIS</p>
+        <p style="color: #666; font-size: 0.8rem; letter-spacing: 2px;">O SEU ASSISTENTE AI PARA ROTEIROS VIRAIS</p>
     </header>
 
     <div class="niche-selector">
@@ -193,17 +193,21 @@
             <label>Detalhes Adicionais (Opcional)</label>
             <textarea id="detalhes" placeholder="Ex: Focar na parte do fogo descendo do céu..."></textarea>
         </div>
-        <button class="generate-btn" onclick="gerar()">FORJAR ROTEIRO REAL</button>
+        <div class="field" style="margin-top: 15px;">
+            <label>Gemini API Key (Para roteiros 100% únicos)</label>
+            <input type="password" id="apiKey" placeholder="Cola aqui a tua chave do Gemini">
+        </div>
+        <button class="generate-btn" style="margin-top: 20px;" onclick="gerar()">FORJAR ROTEIRO COM AI</button>
     </div>
 
     <div id="loader" class="loader">
-        <p style="color: var(--primary); font-weight: bold;">CRIANDO NARRATIVA DE ALTA RETENÇÃO...</p>
+        <p style="color: var(--primary); font-weight: bold;">IA PROCESSANDO NARRATIVA DE ALTA RETENÇÃO...</p>
     </div>
 
     <div id="results" class="results">
         <div class="result-card">
             <div class="card-header">
-                <label>Título Magnético</label>
+                <label>Título Magnético (AI Generated)</label>
                 <div class="copy-btn" onclick="copy('titulo')">COPIAR</div>
             </div>
             <pre id="titulo" style="font-weight: 900; color: var(--primary); font-size: 1.2rem;"></pre>
@@ -211,8 +215,7 @@
 
         <div class="result-card">
             <div class="card-header">
-                <label>Roteiro Completo para Narração</label>
-                <div class="copy-chip" style="font-size: 0.6rem; color: #666;">COPIE E COLE NO VO3</div>
+                <label>Roteiro Completo (AI Generated)</label>
                 <div class="copy-btn" onclick="copy('roteiro')">COPIAR TUDO</div>
             </div>
             <pre id="roteiro"></pre>
@@ -225,68 +228,88 @@
 <div id="notif" class="notification">Copiado!</div>
 
 <script>
-    let niche = 'biblico';
+    let currentNiche = 'biblico';
 
     function setNiche(n, el) {
-        niche = n;
+        currentNiche = n;
         document.querySelectorAll('.niche-btn').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
     }
 
-    const scripts = {
-        biblico: {
-            titulos: ["O MISTÉRIO DE [TEMA]", "A VERDADE ESCONDIDA: [TEMA]", "POR QUE NINGUÉM FALA DE [TEMA]?"],
-            base: "Prepare-se para descobrir o que as escrituras escondem sobre [TEMA]. [DETALHE] Diz a história que este momento mudou tudo. Não foi apenas um evento, foi um sinal. Você consegue sentir o peso desta revelação? A arqueologia e os textos antigos confirmam que [TEMA] carrega um segredo que poucos conhecem. Observe como cada detalhe se encaixa perfeitamente no plano divino. Se você quer saber o desfecho deste mistério, curta este vídeo e comente 'AMÉM'."
-        },
-        luxo: {
-            titulos: ["A MANSÃO DE [TEMA]", "O TOPO DO LUXO EM [TEMA]", "POR DENTRO DE [TEMA]"],
-            base: "Bem-vindo ao ápice da exclusividade em [TEMA]. [DETALHE] Aqui, o design encontra a perfeição em cada centímetro quadrado. Esta propriedade redefine o que conhecemos por luxo moderno. Desde os acabamentos em mármore raro até a vista de tirar o fôlego, [TEMA] é um monumento à sofisticação. Você moraria aqui? Comente qual seu detalhe favorito."
-        },
-        viral: {
-            titulos: ["ISSO É REAL? [TEMA]", "OLHA O FINAL: [TEMA]", "VÊ ATÉ O FIM [TEMA]"],
-            base: "Você não vai acreditar no que acontece com [TEMA]. [DETALHE] Preste muita atenção no movimento. É algo que desafia a lógica. O segredo de [TEMA] revelado em 8 segundos de puro impacto. Compartilhe se você ficou chocado!"
-        }
-    };
-
-    function gerar() {
-        const tema = document.getElementById('tema').value || 'Exploração';
+    async function gerar() {
+        const tema = document.getElementById('tema').value;
         const detalhes = document.getElementById('detalhes').value;
         const numCenas = parseInt(document.getElementById('cenas').value);
         const duracao = parseInt(document.getElementById('duracao').value);
+        const apiKey = document.getElementById('apiKey').value;
+
+        if(!tema) { alert("Escreve um tema primeiro!"); return; }
 
         document.getElementById('results').style.display = 'none';
         document.getElementById('loader').style.display = 'block';
 
-        setTimeout(() => {
-            const s = scripts[niche];
-            const tituloFinal = s.titulos[Math.floor(Math.random()*s.titulos.length)].replace('[TEMA]', tema);
-            document.getElementById('titulo').innerText = tituloFinal;
+        if(apiKey) {
+            // USAR AI REAL (GEMINI)
+            try {
+                const prompt = `Atua como um roteirista especialista em YouTube Shorts de alta retenção. 
+                Nicho: ${currentNiche}. Tema: ${tema}. Detalhes: ${detalhes}. 
+                Gera: 
+                1. Um título viral curto e impactante.
+                2. Um roteiro de narração completo e envolvente para ${duracao} segundos.
+                3. ${numCenas} prompts cinematográficos detalhados (em inglês) para geração de imagem, um para cada cena.
+                Responde apenas em formato JSON: {"titulo": "...", "roteiro": "...", "cenas": [{"prompt": "..."}]}`;
 
-            let roteiroFinal = s.base.replaceAll('[TEMA]', tema).replace('[DETALHE]', detalhes ? detalhes + " " : "");
-            document.getElementById('roteiro').innerText = roteiroFinal;
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
 
-            // Gerar Cenas Individuais
-            let cenasHTML = "";
-            const tempoCena = (duracao / numCenas).toFixed(1);
-            
-            for(let i=1; i<=numCenas; i++) {
-                const start = ((i-1)*tempoCena).toFixed(1);
-                const end = (i*tempoCena).toFixed(1);
-                cenasHTML += `
-                    <div class="result-card">
-                        <div class="card-header">
-                            <label>CENA ${i} [${start}-${end}s]</label>
-                            <div class="copy-btn" onclick="copy('cena-${i}')">COPIAR PROMPT</div>
-                        </div>
-                        <pre id="cena-${i}">${tema} scene ${i}, cinematic lighting, 8k, hyper-detailed, ${niche === 'biblico' ? 'epic religious atmosphere' : niche === 'luxo' ? 'luxury modern design' : 'dynamic viral style'}</pre>
-                    </div>
-                `;
+                const data = await response.json();
+                const aiResponse = JSON.parse(data.candidates[0].content.parts[0].text);
+
+                exibirResultados(aiResponse.titulo, aiResponse.roteiro, aiResponse.cenas, numCenas, duracao);
+            } catch (e) {
+                alert("Erro com a chave API ou limite atingido. Vou usar a base padrão.");
+                gerarBasePadrao(tema, detalhes, numCenas, duracao);
             }
-            document.getElementById('cenas-container').innerHTML = cenasHTML;
+        } else {
+            gerarBasePadrao(tema, detalhes, numCenas, duracao);
+        }
+    }
 
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('results').style.display = 'block';
-        }, 2000);
+    function exibirResultados(titulo, roteiro, cenasAI, numCenas, duracao) {
+        document.getElementById('titulo').innerText = titulo;
+        document.getElementById('roteiro').innerText = roteiro;
+
+        let cenasHTML = "";
+        const tempoCena = (duracao / numCenas).toFixed(1);
+        
+        for(let i=0; i<numCenas; i++) {
+            const start = (i*tempoCena).toFixed(1);
+            const end = ((i+1)*tempoCena).toFixed(1);
+            const prompt = cenasAI[i] ? cenasAI[i].prompt : "Cinematic scene, detailed 8k";
+            cenasHTML += `
+                <div class="result-card">
+                    <div class="card-header">
+                        <label>CENA ${i+1} [${start}-${end}s]</label>
+                        <div class="copy-btn" onclick="copy('cena-${i}')">COPIAR</div>
+                    </div>
+                    <pre id="cena-${i}">${prompt}</pre>
+                </div>
+            `;
+        }
+        document.getElementById('cenas-container').innerHTML = cenasHTML;
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('results').style.display = 'block';
+    }
+
+    function gerarBasePadrao(tema, detalhes, numCenas, duracao) {
+        // Lógica de fallback (a mesma da V3)
+        const titulo = `O MISTÉRIO DE ${tema.toUpperCase()}`;
+        const roteiro = `Prepare-se para descobrir a verdade sobre ${tema}. ${detalhes} ... (Usando base padrão)`;
+        const cenas = Array(numCenas).fill({prompt: `${tema} cinematic scene, 8k`});
+        exibirResultados(titulo, roteiro, cenas, numCenas, duracao);
     }
 
     function copy(id) {
@@ -297,6 +320,5 @@
         setTimeout(() => n.style.display = 'none', 2000);
     }
 </script>
-
 </body>
 </html>
