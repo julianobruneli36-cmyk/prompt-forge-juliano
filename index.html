@@ -370,19 +370,20 @@
             const niche = data[currentNiche];
             
             // Título
-            document.getElementById('titulo').innerText = niche.titulos[Math.floor(Math.random() * niche.titulos.length)].replace('[TEMA]', tema);
+            document.getElementById('titulo').innerText = niche.titulos[Math.floor(Math.random() * niche.titulos.length)].replaceAll('[TEMA]', tema);
 
             // Script
-            let script = `${niche.hooks[Math.floor(Math.random() * niche.hooks.length)].replace('[TEMA]', tema)}
+            let hook = niche.hooks[Math.floor(Math.random() * niche.hooks.length)].replaceAll('[TEMA]', tema);
+            let script = `${hook}
 
 `;
-            script += `As escrituras e os registros antigos sugerem que [TEMA] carrega um peso que a história moderna tentou apagar.
+            script += `As escrituras e os registros antigos sugerem que ${tema} carrega um peso que a história moderna tentou apagar.
 
 `;
-            script += `Observe os detalhes. A conexão entre o passado e o que vemos agora é inegável.
+            script += `Observe os detalhes em cada cena. A conexão entre o passado de ${tema} e o que vemos agora é inegável.
 
 `;
-            script += `Se você quer entender mais sobre esses mistérios, comente "EU QUERO" e siga o canal.`;
+            script += `Se você quer entender mais sobre os mistérios de ${tema}, comente "EU QUERO" e siga o canal.`;
             document.getElementById('script').innerText = script;
 
             // Prompts
